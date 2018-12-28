@@ -21,7 +21,14 @@ export default class Login extends Component {
     super(props);
     this.navigation = this.props.navigation;
     this.socket = this.props.navigation.getParam('socket');
+    this.socket.onmessage = (event) =>{
+      var user = JSON.parse(event.data);
+      if (user.action === "login_succes") {
+        this.navigation.navigate('Loading',{socket:this.socket});
+      }
+    }
   }
+
   static navigationOptions = {
     header: null,
     title: 'Login',
@@ -54,8 +61,9 @@ class Form extends Component{
     this.submit = this.submit.bind(this);
   }
   submit(){
-    var CryptoJS = require("crypto-js");
-    const pass = CryptoJS.HmacSHA256(this.state.username,this.state.password);
+    const CryptoJS = require("crypto-js");
+    const hash = CryptoJS.HmacSHA256(this.state.username,this.state.password);
+    const pass = CryptoJS.enc.Base64.stringify(hash);
     var UserAction = {
       action: "login",
       name: this.state.username,
