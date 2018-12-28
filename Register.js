@@ -9,15 +9,12 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity,DatePickerAndroid,AsyncStorage,Alert} from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
 
-type Props = {};
-export default class Register extends Component<Props> {
+export default class Register extends Component {
+  constructor(props){
+    super(props);
+    this.socket = this.props.navigation.getParam("socket");
+  }
   static navigationOptions = {
     title: 'Header',
     header:null,
@@ -34,15 +31,15 @@ export default class Register extends Component<Props> {
             </View>
           </View>
         </View>
-        <Form/>
+        <Form socket = {this.socket}/>
       </View>
     );
   }
 }
 
 class Form extends Component{
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state = {
       username:null,
       password:null,
@@ -51,8 +48,44 @@ class Form extends Component{
       gender:'M',
       f : 1,
       m: 2,
+      error:false,
+      errorMessage:null,
     }
+    //Other props
+    this.socket = this.props.socket;
+
+    //bind Functions
     this._pickBirthDate = this._pickBirthDate.bind(this);
+    this.submit = this.submit.bind(this);
+  }
+  submit(){
+    var errMsg = null;
+    if(this.state.username == null || this.state.username.length < 5){
+      errMsg = 'Your fill in your username correctly';
+    }else if(this.state.password == null || this.state.password.length<5){
+      errMsg = 'Your fill in your password correctly';
+    }else if(this.state.email == null){
+      errMsg = 'Your fill in your email address';
+    }else if(this.state.birthdate == 'Select your birthdate'){
+      errMsg = 'Your fill in your password correctly';
+    }
+    if(errMsg != null){
+      this.setState({error:true,errorMessage:errMsg});
+    }else{
+      const CryptoJS = require("crypto-js");
+      const hash = CryptoJS.HmacSHA256(this.state.username,this.state.password);
+      const pass = CryptoJS.enc.Base64.stringify(hash);
+      const UserAction = {
+        action:'register',
+        username:this.state.username,
+        password:pass,
+        email:this.state.email,
+        birthdate:this.state.birthdate,
+        gender:'M'
+      };
+      this.socket.send(JSON.stringify(UserAction));
+    }
+
   }
   async _pickBirthDate(){
     try {
@@ -63,7 +96,7 @@ class Form extends Component{
       });
       if (action !== DatePickerAndroid.dismissedAction) {
         // Selected year, month (0-11), day
-        this.setState({birthdate:year.toString() +"-"+ month.toString()+"-"+day.toString()});
+        this.setState({birthdate:year.toString() +"-"+ (month+1).toString()+"-"+day.toString()});
       }
     } catch ({code, message}) {
       console.warn('Cannot open date picker', message);
@@ -109,13 +142,29 @@ class Form extends Component{
         >
         <View style={{height:'100%'}}><Text style={{textAlign:'center',fontSize:20,color:'rgb(100,100,100)'}} >{this.state.birthdate}</Text></View>
         </TouchableOpacity>
+        <Error show={this.state.error} message ={this.state.errorMessage}/>
         <TouchableOpacity
           style={{justifyContent:'center',alignItems:'center',height: '15%',minHeight:50,borderWidth:1,borderColor:'rgb(220,220,220)',padding:'5%',borderRadius:10,fontSize:15,marginBottom:'5%'}}
+          onPress = {this.submit}
         >
         <View style={{height:'100%'}}><Text style={{textAlign:'center',fontSize:20}} >Register</Text></View>
         </TouchableOpacity>
       </View>
     );
+  }
+}
+
+class Error extends Component{
+  render(){
+    if(this.props.show){
+      return(
+        <Text style={{fontSize:15,color:'red',textAlign:'center',width:'100%'}}>
+          {this.props.message}
+        </Text>
+      );
+    }else{
+      return(null);
+    }
   }
 }
 

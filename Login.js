@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity} from 'react-native';
+import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Alert} from 'react-native';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -16,8 +16,12 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
-export default class App extends Component<Props> {
+export default class Login extends Component {
+  constructor(props){
+    super(props);
+    this.navigation = this.props.navigation;
+    this.socket = this.props.navigation.getParam('socket');
+  }
   static navigationOptions = {
     header: null,
     title: 'Login',
@@ -30,13 +34,35 @@ export default class App extends Component<Props> {
             <Image source = {{uri:'https://brandmark.io/logo-rank/random/beats.png'}} style={{width:90,height:90,paddingBottom:'5%'}}/>
           </View>
         </View>
-        <Form/>
+        <Form navigation = {this.navigation} socket = {this.socket}/>
       </View>
     );
   }
 }
 
 class Form extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      username:null,
+      password:null,
+    }
+    this.navigation = this.props.navigation;
+    this.socket = this.props.socket;
+
+    //Functions are binded here
+    this.submit = this.submit.bind(this);
+  }
+  submit(){
+    var CryptoJS = require("crypto-js");
+    const pass = CryptoJS.HmacSHA256(this.state.username,this.state.password);
+    var UserAction = {
+      action: "login",
+      name: this.state.username,
+      pass: pass
+    };
+    this.socket.send(JSON.stringify(UserAction));
+  }
   render(){
     return(
       <View style={{height:'65%',width:'100%'}}>
@@ -48,10 +74,12 @@ class Form extends Component{
         <TextInput
           style={{height: '15%',minHeight:50,borderWidth:1,borderColor:'rgb(220,220,220)',padding:'5%',borderRadius:10,fontSize:15,marginBottom:'5%'}}
           placeholder="password"
+          secureTextEntry = {true}
           onChangeText={(text) => this.setState({password:text})}
         />
         <TouchableOpacity
           style={{justifyContent:'center',alignItems:'center',height: '15%',minHeight:50,borderWidth:1,borderColor:'rgb(220,220,220)',padding:'5%',borderRadius:10,fontSize:15,marginBottom:'5%'}}
+          onPress = {this.submit}
         >
           <View style={{height:'100%'}}><Text style={{textAlign:'center',fontSize:20}} >Login </Text></View>
         </TouchableOpacity>
@@ -62,6 +90,7 @@ class Form extends Component{
         </TouchableOpacity>
         <TouchableOpacity
           style={{justifyContent:'center',alignItems:'center',height: '15%',minHeight:50,borderWidth:1,borderColor:'rgb(220,220,220)',padding:'5%',borderRadius:10,fontSize:15,marginBottom:'5%'}}
+          onPress={()=> this.navigation.navigate('Register',{socket:this.socket})}
         >
         <View style={{height:'100%'}}><Text style={{textAlign:'center',fontSize:20}} >Register</Text></View>
         </TouchableOpacity>

@@ -6,9 +6,9 @@ import Register from "./Register";
 import App from './App';
 
 const StackNav = createStackNavigator({
+  App:{screen:App},
   Register:{screen:Register},
   Login:{screen:Login},
-  App:{screen:App},
 });
 
 const AppContainer = createAppContainer(StackNav);
