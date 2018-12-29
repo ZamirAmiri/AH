@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Alert} from 'react-native';
+import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity,AsyncStorage} from 'react-native';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -59,17 +59,28 @@ class Form extends Component{
 
     //Functions are binded here
     this.submit = this.submit.bind(this);
+    this.saveLogInInfo = this.saveLogInInfo.bind(this);
   }
   submit(){
     const CryptoJS = require("crypto-js");
+
     const hash = CryptoJS.HmacSHA256(this.state.username,this.state.password);
     const pass = CryptoJS.enc.Base64.stringify(hash);
+    this.saveLogInInfo(pass);
     var UserAction = {
       action: "login",
       name: this.state.username,
       pass: pass
     };
     this.socket.send(JSON.stringify(UserAction));
+  }
+  async saveLogInInfo(password){
+    try {
+      await AsyncStorage.setItem('username', this.state.username);
+      await AsyncStorage.setItem('password', password);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
   render(){
     return(

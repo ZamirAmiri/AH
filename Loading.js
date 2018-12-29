@@ -63,6 +63,7 @@ export default class Loading extends Component {
           progress = progress + pg;
           string = progress.toString().concat('%');
           this.setState({msg:msg,progress:string,pg:progress});
+          async AsyncStorage.setItem(server.action,JSON.stringify(server));
         }
       }
     }
