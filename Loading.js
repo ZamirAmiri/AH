@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,Image,Alert} from 'react-native';
+import {Platform, StyleSheet, Text, View,Image,AsyncStorage} from 'react-native';
 
 
 
@@ -20,7 +20,7 @@ export default class Loading extends Component {
     }
     this.navigation = this.props.navigation;
     this.socket = this.navigation.getParam('socket');
-    this.socket.onmessage = (event) => {
+    this.socket.onmessage = async (event) => {
       var server = JSON.parse(event.data);
       var pg = 100/6;
       var progress = this.state.pg;
@@ -63,7 +63,7 @@ export default class Loading extends Component {
           progress = progress + pg;
           string = progress.toString().concat('%');
           this.setState({msg:msg,progress:string,pg:progress});
-          async AsyncStorage.setItem(server.action,JSON.stringify(server));
+          await AsyncStorage.setItem(server.type,JSON.stringify(server));
         }
       }
     }
