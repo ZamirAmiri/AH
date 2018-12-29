@@ -13,7 +13,15 @@ import {Platform, StyleSheet, Text, View,Image,TextInput,TouchableOpacity,DatePi
 export default class Register extends Component {
   constructor(props){
     super(props);
+    this.navigation = this.props.navigation;
     this.socket = this.props.navigation.getParam("socket");
+    this.socket.onmessage = (event) =>{
+      var user = JSON.parse(event.data);
+      if (user.action === "unverified_user") {
+        this.navigation.navigate('Recovery',{socket:this.socket,action:'activate_account'});
+      }
+    }
+    
   }
   static navigationOptions = {
     title: 'Header',

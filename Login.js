@@ -21,12 +21,7 @@ export default class Login extends Component {
     super(props);
     this.navigation = this.props.navigation;
     this.socket = this.props.navigation.getParam('socket');
-    this.socket.onmessage = (event) =>{
-      var user = JSON.parse(event.data);
-      if (user.action === "login_succes") {
-        this.navigation.navigate('Loading',{socket:this.socket});
-      }
-    }
+
   }
 
   static navigationOptions = {
@@ -56,6 +51,15 @@ class Form extends Component{
     }
     this.navigation = this.props.navigation;
     this.socket = this.props.socket;
+    this.socket.onmessage = (event) =>{
+      var user = JSON.parse(event.data);
+      if (user.action === "login_succes") {
+        this.saveLogInInfo();
+        this.navigation.navigate('Loading',{socket:this.socket});
+      }else if (user.action === "unverified_user") {
+        this.navigation.navigate('Recovery',{socket:this.socket,action:'activate_account'});
+      }
+    }
 
     //Functions are binded here
     this.submit = this.submit.bind(this);
@@ -66,7 +70,7 @@ class Form extends Component{
 
     const hash = CryptoJS.HmacSHA256(this.state.username,this.state.password);
     const pass = CryptoJS.enc.Base64.stringify(hash);
-    this.saveLogInInfo(pass);
+    this.setState({pass:pass});
     var UserAction = {
       action: "login",
       name: this.state.username,
@@ -74,10 +78,10 @@ class Form extends Component{
     };
     this.socket.send(JSON.stringify(UserAction));
   }
-  async saveLogInInfo(password){
+  async saveLogInInfo(){
     try {
       await AsyncStorage.setItem('username', this.state.username);
-      await AsyncStorage.setItem('password', password);
+      await AsyncStorage.setItem('password', this.state.pass);
     } catch (error) {
       console.log(error.message);
     }
@@ -114,8 +118,8 @@ class Form extends Component{
         <View style={{height:'100%'}}><Text style={{textAlign:'center',fontSize:20}} >Register</Text></View>
         </TouchableOpacity>
         <View style={{flexDirection:'row',justifyContent:'space-between',width:'100%'}}>
-          <TouchableOpacity><Text style={{fontSize:15,color:'rgb(190,190,190)'}}>Forgot password</Text></TouchableOpacity>
-          <TouchableOpacity><Text style={{fontSize:15,color:'rgb(190,190,190)'}}>Forgot username</Text></TouchableOpacity>
+          <TouchableOpacity onPress= {()=>this.navigation.navigate('Recovery',{'socket':this.socket,'action':'forgot_password'})}><Text style={{fontSize:15,color:'rgb(190,190,190)'}}>Forgot password</Text></TouchableOpacity>
+          <TouchableOpacity onPress= {()=>this.navigation.navigate('Recovery',{'socket':this.socket,'action':'forgot_username'})}><Text style={{fontSize:15,color:'rgb(190,190,190)'}}>Forgot username</Text></TouchableOpacity>
         </View>
       </View>
     );

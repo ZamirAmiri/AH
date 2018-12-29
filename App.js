@@ -20,6 +20,8 @@ export default class App extends Component {
       var user = JSON.parse(event.data);
       if (user.action === "login_succes") {
         this.navigation.navigate('Loading',{socket:this.socket});
+      }else if (user.action === "unverified_user") {
+        this.navigation.navigate('Recovery',{socket:this.socket,action:'activate_account'});
       }
     }
     this.getLogInInfo = this.getLogInInfo.bind(this);
