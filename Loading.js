@@ -57,6 +57,7 @@ export default class Loading extends Component {
           case 'openproject_other':
           flag = true;
           msg = 'Done';
+          this.finishLoading();
           break;
         }
         if(flag){
@@ -74,6 +75,7 @@ export default class Loading extends Component {
     this.getHelpers = this.getHelpers.bind(this);
     this.getHelpees = this.getHelpees.bind(this);
     this.getOpenProject_other = this.getOpenProject_other.bind(this);
+    this.finishLoading = this.finishLoading.bind(this);
   }
   componentDidMount(){
     const userAction={
@@ -119,6 +121,9 @@ export default class Loading extends Component {
       type:'openproject_other'
     };
     this.send(userAction);
+  }
+  finishLoading(){
+    this.navigation.navigate('Home',{'socket':this.socket});
   }
 
   static navigationOptions = {

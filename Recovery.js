@@ -208,7 +208,6 @@ class ActivateResetPassword extends Component{
       </View>
       <TextInput style={{borderWidth:1,borderColor:'rgb(240,240,240)',fontSize:15,borderRadius:10,marginTop:'10%',padding:'5%',height:'12%',minHeight:50,marginBottom:'5%'}}
         placeholder="username"
-        secureTextEntry = {true}
         onChangeText={(text) => this.setState({username:text})}
       />
       <TextInput style={{borderWidth:1,borderColor:'rgb(240,240,240)',fontSize:15,borderRadius:10,padding:'5%',height:'12%',minHeight:50,marginBottom:'5%'}}
