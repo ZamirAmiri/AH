@@ -9,7 +9,13 @@ import Recovery from './Recovery';
 import Home from './Home';
 import TabNavigator from './TabNavigator';
 import Explore from './Explore';
+import Tasks from './Tasks';
+import Activity from './Activity';
+import Profile from './Profile';
 const StackNav = createStackNavigator({
+    Profile:{screen:Profile},
+    Activity:{screen:Activity},
+    Tasks:{screen:Tasks},
     TabNavigator:{screen:TabNavigator},
     Explore:{screen:Explore},
     Home:{screen:Home},

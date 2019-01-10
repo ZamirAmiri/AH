@@ -21,6 +21,7 @@ export default class Home extends Component {
     }
   }
 
+
   render() {
     return (
       <View style={{flex:1}}>
@@ -117,7 +118,7 @@ class ProgressBar extends Component{
       <LinearGradient
         start={{x: 0.0, y: 0.0}} end={{x: 1.0, y: 1.0}}
         colors={['rgb(255,180,0)', 'rgb(255,0,0)']}
-        style={{width:'20%',height:'100%'}}
+        style={{width:'20%',height:'100%',borderRadius:200}}
         >
       </LinearGradient>
       </View>

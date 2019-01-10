@@ -16,7 +16,7 @@ export default class Explore extends Component {
   constructor(props){
     super(props);
     this.state={
-      data:[{key:'h'},{key:'sh', small:'Articles', large :'News'},{key:'p'},{key:'p'},{key:'p'},{key:'sh', small:'People Helping', large:'Trending'},{key:'T'}]
+      data:[{key:'h'},{key:'sh', small:'Ways of creating dough.', large :'Solo'},{key:'p'},{key:'p'},{key:'p'},{key:'sh', small:'Ask a friend to help your project', large:'Friends'},{key:'T'}]
     }
   }
 
@@ -26,13 +26,13 @@ export default class Explore extends Component {
         <FlatList
           data={this.state.data}
           style={{flex:1,backgroundColor:'rbg(150,150,150)'}}
-          contentContainerStyle={{width:'100%',padding:0}}
+          contentContainerStyle={{width:'100%'}}
           renderItem={({item}) => {if(item.key == 'h'){
               return(<Header/>);
             }else if(item.key == 'sh'){
               return(<Seccond_Header small={item.small} large={item.large}/>);
             }else if (item.key == 'p'){
-                return(<Tile/>);
+                return(<TrendingProjects/>);
               }else{
                 return(<TrendingProjects/>);
               }
@@ -48,32 +48,28 @@ export default class Explore extends Component {
 class Header extends Component{
   render(){
     return(
-        <View style={{width:'100%',height:300,}}>
-          <View style={{height:'15%',width:'100%'}}></View>
-          <View style={{width:'100%',height:'15%',justifyContent:'center',paddingLeft:'5%',paddingRight:'5%'}}>
-            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>Explore</Text>
+        <View style={{width:'100%',height:250}}>
+          <View style={{height:'18%',width:'100%'}}></View>
+          <View style={{width:'100%',height:'26%',justifyContent:'center',paddingLeft:'5%',paddingRight:'5%'}}>
+            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>Tasks</Text>
           </View>
-          <ProgressBar height='1%'/>
-          <View style={{padding:'5%',width:'100%',height:'27%'}}>
-            <TextInput style={{width:'100%',height:'100%',textAlign:'center',fontWeight:'400',backgroundColor:'rgb(250,250,250)',borderRadius:5}}
-              placeholder='search'
-            />
+          <View style={{width:'50%',paddingLeft:'5%',height:'1%'}}><ProgressBar height='100%' width='100%'/></View>
+          <View style={{padding:'5%',width:'100%',height:'30%',justifyContent:'flex-end'}}>
+            <Text style={{fontSize:10,fontWeight:'500'}}>Shortcuts to your favorite hustles</Text>
+            <Text style={{fontSize:22,fontWeight:'500',color:'black'}}>Favorites</Text>
           </View>
-          <View style={{width:'100%',height:'15%',justifyContent:'center',paddingLeft:'5%',paddingRight:'5%'}}>
-            <Text style={{color:'black',fontSize:15,fontWeight:'400'}}>People you might know..</Text>
-          </View>
-          <View style={{width:'100%',height:'25%'}}>
+          <View style={{width:'100%',height:'23%'}}>
             <FlatList
-              style={{width:'100%',height:'100%',paddingLeft:'5%',paddingRight:'5%'}}
-              data={[{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'}]}
+              data={[{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'}]}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
-              renderItem={({item}) =>{
-                return(
-                  <View style={{height:'100%',width:85}}>
-                    <Image source={{uri:'https://media.licdn.com/dms/image/C4E03AQG1IdzY7-PsUA/profile-displayphoto-shrink_200_200/0?e=1551916800&v=beta&t=rULLnNcLWVsAZfu1PdKOtTetlf1fQGvhN-sVmP4FhXU'}} style={{width:75,height:'100%',borderRadius:500}}/>
-                  </View>
-                );
+              renderItem={({item}) => {
+                return(<View style={{width:160,height:'100%',alignItems:'flex-end'}}>
+                  <TouchableOpacity style={{width:'90%',height:'100%',borderWidth:2,borderColor:'rgb(230,230,230)',borderRadius:5,justifyContent:'center',paddingLeft:'10%',paddingRight:'10%'}}>
+                    <Text>Watch an ad</Text>
+                    <View style={{flexDirection:'row',alignItems:'center'}}><Text>1</Text><View style={{width:12,height:12,borderRadius:12,backgroundColor:'red'}}/></View>
+                  </TouchableOpacity>
+                </View>);
               }}
             />
           </View>
@@ -85,7 +81,7 @@ class Header extends Component{
 class Seccond_Header extends Component{
   render(){
     return(
-      <View style={{width:'100%',height:95,justifyContent:'center',paddingLeft:'5%',paddingRight:'5%'}}>
+      <View style={{width:'100%',justifyContent:'center',paddingLeft:'5%',paddingRight:'5%',paddingTop:'3%'}}>
         <Text style={{fontSize:12}}>{this.props.small}</Text>
         <Text style={{fontSize:25,fontWeight:'500',color:'black'}}>{this.props.large}</Text>
       </View>
@@ -93,31 +89,11 @@ class Seccond_Header extends Component{
   }
 }
 
-class Tile extends Component{
-  render(){
-    return(
-        <View style={{width:'90%',height:325,marginLeft:'5%',marginRight:'5%',marginBottom:'5%',borderRadius:15,backgroundColor:'white',overflow:'hidden',borderColor:'rgb(250,250,250)',elevation:5}}>
-          <ImageBackground
-            source = {{uri:'https://us.whales.org/sites/default/files/styles/large_carousel/public/species/humpback_whale_megaptera_novaeangliae_15_feb-10-11049.jpg?itok=vHlZOW2L'}}
-            imageStyle={{width:'100%',height:'100%'}}
-            style={{width:'100%',height:'100%',justifyContent:'flex-end'}}>
-              <View style={{padding:'5%',width:'100%',height:'20%',justifyContent:'center'}}>
-                <Text style={{fontSize:10,fontWeight:'500'}}>#automation#desktop</Text>
-                <Text style={{fontSize:20,color:'white',fontWeight:'800'}}>New Feature</Text>
-              </View>
-              <View style={{width:'100%',height:'15%',backgroundColor:'rgba(255,255,255,0.5)',justifyContent:'center',alignItems:'center'}}>
-                <Image source={{uri:'http://download.seaicons.com/icons/graphicloads/100-flat-2/256/thumbs-up-icon.png'}} style={{width:40,height:40}}/>
-              </View>
-          </ImageBackground>
-        </View>
-      );
-  }
-}
 
 class TrendingProjects extends Component{
   render(){
     return(
-      <View style={{width:'90%',height:280,margin:'5%',borderRadius:15,backgroundColor:'white',overflow:'hidden',borderColor:'rgb(250,250,250)',elevation:5}}>
+      <View style={{width:'90%',height:280,marginLeft:'5%',marginRight:'5%',marginTop:'5%',borderRadius:15,backgroundColor:'white',overflow:'hidden',borderColor:'rgb(250,250,250)',elevation:5}}>
         <ImageBackground
           source = {{uri:'https://us.whales.org/sites/default/files/styles/large_carousel/public/species/humpback_whale_megaptera_novaeangliae_15_feb-10-11049.jpg?itok=vHlZOW2L'}}
           imageStyle={{width:'100%',height:'100%'}}
@@ -144,7 +120,7 @@ class TrendingProjects extends Component{
           </View>
           </View>
         </View>
-        <ProgressBar height='4%'/>
+        <ProgressBar height='4%' width='100%'/>
       </View>
     );
   }
@@ -155,11 +131,12 @@ class ProgressBar extends Component{
     super(props);
     this.state={
       height:this.props.height,
+      width:this.props.width,
     }
   }
   render(){
     return(
-      <View style={{width:'50%',height:this.state.height,borderRadius:200,overflow:'hidden',paddingLeft:'5%'}}>
+      <View style={{width:this.state.width,height:this.state.height,overflow:'hidden'}}>
       <LinearGradient
         start={{x: 0.0, y: 0.0}} end={{x: 1.0, y: 1.0}}
         colors={['rgb(255,180,0)', 'rgb(255,0,0)']}
