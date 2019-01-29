@@ -10,16 +10,13 @@ import Home from './Home';
 import TabNavigator from './TabNavigator';
 import Explore from './Explore';
 import Tasks from './Tasks';
-import Activity from './Activity';
-import Profile from './Profile';
+
 const StackNav = createStackNavigator({
-  Activity:{screen:Activity},
-    Profile:{screen:Profile},
-    Tasks:{screen:Tasks},
+    App:{screen:App},
     TabNavigator:{screen:TabNavigator},
+    Tasks:{screen:Tasks},
     Explore:{screen:Explore},
     Home:{screen:Home},
-    App:{screen:App},
     Register:{screen:Register},
     Login:{screen:Login},
     Loading:{screen:Loading},

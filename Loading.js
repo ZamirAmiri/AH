@@ -123,7 +123,7 @@ export default class Loading extends Component {
     this.send(userAction);
   }
   finishLoading(){
-    this.navigation.navigate('Home',{'socket':this.socket});
+    this.navigation.navigate('TabNavigator',{'socket':this.socket});
   }
 
   static navigationOptions = {
