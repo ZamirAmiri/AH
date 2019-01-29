@@ -16,7 +16,7 @@ export default class Explore extends Component {
   constructor(props){
     super(props);
     this.state={
-      data:[{key:'h'},{key:'sh', small:'Today'},{key:'n'},{key:'n'},{key:'n'},{key:'sh', small:'Yesterday'},{key:'n'},{key:'n'},{key:'n'},{key:'n'}]
+      data:[{key:'h'},{key:'sh', small:'Today'},{key:'n'},{key:'n'},{key:'n'},{key:'sh', small:'Yesterday'},{key:'n'},{key:'n'},{key:'n'},{key:'n'},{key:'sh', small:'Yesterday'},{key:'nb'},{key:'nb'},{key:'nb'},{key:'nb'}]
     }
   }
 
@@ -34,7 +34,7 @@ export default class Explore extends Component {
             }else if (item.key == 'n'){
                 return(<Notification/>);
               }else{
-                return(null);
+                return(<NotificationWithButton/>);
               }
               }
             }
@@ -52,7 +52,7 @@ class Header extends Component{
           <View style={{height:'30%',width:'100%'}}></View>
           <View style={{width:'100%',height:'25%',justifyContent:'center',paddingLeft:'5%',paddingRight:'5%'}}>
             <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>Activity</Text>
-            <View style={{width:'50%',paddingLeft:'5%',height:'1%'}}><ProgressBar height='100%' width='100%'/></View>
+            <View style={{width:'50%',height:3}}><ProgressBar height='100%' width='100%'/></View>
           </View>
           <View style={{width:'50%',height:'45%',justifyContent:'center',flexDirection:'row',alignItems:'flex-end',alignItems:'center',padding:'5%'}}>
             <View style={{width:'50%',height:'100%',backgroundColor:'rgb(200,255,200)',borderRadius:500}}></View>
@@ -86,6 +86,32 @@ class Notification extends Component{
         </View>
       </View>
     );
+  }
+}
+
+class NotificationWithButton extends Component{
+  render(){
+    return(
+      <View style={{width:'90%',height:75,marginLeft:'5%',marginRight:'5%',marginTop:'1%',overflow:'hidden',borderColor:'rgb(250,250,250)',flexDirection:'row',borderBottomWidth:2,justifyContent:'center'}}>
+        <View style={{width:'20%',height:'83%',justifyContent:'center',alignItems:'center'}}>
+          <Image style={{width:'100%',height:'100%',borderRadius:500}} source={{uri:'https://media.licdn.com/dms/image/C4E03AQG1IdzY7-PsUA/profile-displayphoto-shrink_200_200/0?e=1551916800&v=beta&t=rULLnNcLWVsAZfu1PdKOtTetlf1fQGvhN-sVmP4FhXU'}}/>
+        </View>
+        <View style={{width:'50%',height:'100%',justifyContent:'center',paddingLeft:'2.5%'}}>
+          <Text><Text style={{fontWeight:'900'}}>shairamiri</Text> has started helping you<Text style={{color:'rgb(240,240,240)',fontWeight:'700'}}> 26m</Text></Text>
+        </View>
+        <View style={{width:'30%',justifyContent:'center',height:'100%'}}>
+        <TouchableOpacity style={{width:'100%',height:'50%'}}>
+        <LinearGradient
+          start={{x: 0.0, y: 0.0}} end={{x: 1.0, y: 1.0}}
+          colors={['rgb(255,180,0)', 'rgb(255,0,0)']}
+          style={{width:'100%',height:'100%',borderRadius:5,justifyContent:'center'}}
+          >
+          <Text style={{textAlign:'center',color:'white'}}> follow </Text>
+        </LinearGradient>
+        </TouchableOpacity>
+        </View>
+      </View>
+      );
   }
 }
 

@@ -63,6 +63,8 @@ buck-out/
 .watchmanconfig
 yarn.lock
 app.json
+__tests__/
+babel.config.js
 
 #Android folder (for now)
 android/

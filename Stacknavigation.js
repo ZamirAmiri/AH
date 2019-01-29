@@ -13,8 +13,8 @@ import Tasks from './Tasks';
 import Activity from './Activity';
 import Profile from './Profile';
 const StackNav = createStackNavigator({
+  Activity:{screen:Activity},
     Profile:{screen:Profile},
-    Activity:{screen:Activity},
     Tasks:{screen:Tasks},
     TabNavigator:{screen:TabNavigator},
     Explore:{screen:Explore},
