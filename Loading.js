@@ -7,15 +7,15 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,Image,AsyncStorage} from 'react-native';
+import {Platform, StyleSheet, Text, View,Image,AsyncStorage,Alert} from 'react-native';
 
 
 
 export default class Loading extends Component {
   constructor(props){
     super(props);
-    this.state={
       progress:0,
+      this.state={
       pg:0,
     }
     this.navigation = this.props.navigation;
@@ -51,10 +51,10 @@ export default class Loading extends Component {
           break;
           case 'helpees':
           msg = 'getting other open projects';
-          flag = 1;
+          flag = true;
           this.getOpenProject_other();
           break;
-          case 'openproject_other':
+          case 'openproject':
           flag = true;
           msg = 'Done';
           this.finishLoading();
@@ -76,6 +76,7 @@ export default class Loading extends Component {
     this.getHelpees = this.getHelpees.bind(this);
     this.getOpenProject_other = this.getOpenProject_other.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
+    this.storageFailure = this.storageFailure.bind(this);
   }
   componentDidMount(){
     const userAction={
@@ -118,12 +119,23 @@ export default class Loading extends Component {
   getOpenProject_other(){
     const userAction={
       action:'update',
-      type:'openproject_other'
+      type:'openproject'
     };
     this.send(userAction);
   }
-  finishLoading(){
-    this.navigation.navigate('TabNavigator',{'socket':this.socket});
+  async finishLoading(){
+    var json = await AsyncStorage.getItem('personal');
+    var data = JSON.parse(json);
+    data.helpcoins = data.helpcoins.toString();
+    data.accumulated = data.accumulated.toString();
+    data.followers = data.followers.toString();
+    data.following = data.following.toString();
+    await AsyncStorage.multiSet([['username',data.username],['birthdate',data.birthdate],['email',data.email],['gender',data.gender],['helpcoins',data.helpcoins],['accumulated',data.accumulated],['followers',data.followers],['following',data.following]]);
+    this.navigation.navigate('TabNavigator');
+  }
+
+  storageFailure(){
+    Alert.alert('Something went wrong! \n Please restart the app.');
   }
 
   static navigationOptions = {
