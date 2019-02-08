@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  *
  * @format
- * @flow
+ * flow
  */
 
 import React, {Component} from 'react';
@@ -40,11 +40,12 @@ export default class Home extends Component {
   }
   async getProjectData(){
     var json = await AsyncStorage.getItem('openproject');
+    const username = await AsyncStorage.getItem('username');
     const dt = JSON.parse(json);
     var data= new Array();
     data[0] = 0;
     for(var i=0;i<dt.messages.length;i++){
-      if(dt.messages[i].username == 'zamiri'){
+      if(dt.messages[i].username == username){
         dt.messages[i].key = 'header';
         data[0] = dt.messages[i];
       }else{

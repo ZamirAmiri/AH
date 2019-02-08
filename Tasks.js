@@ -3,16 +3,21 @@
  * https://github.com/facebook/react-native
  *
  * @format
- * @flow
+ * @lint-ignore-every XPLATJSCOPYRIGHT1
+ * flow
  */
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-
-
+import type { ComponentType } from 'react';
 
 export default class Explore extends Component {
+  static defaultProps = {
+     tooltipValues : [],
+     handleChange  : () => {}
+  }
+  props: Props;
   constructor(props){
     super(props);
     this.state={

@@ -3,15 +3,17 @@
  * https://github.com/facebook/react-native
  *
  * @format
- * @flow
+ * flow
  */
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,Image,AsyncStorage,Alert} from 'react-native';
+import WebsocketController from './WebsocketController';
+let controller = new WebsocketController();
+var socket = controller.ws;
 
-
-
-export default class Loading extends Component {
+type Settings = {}
+export default class Loading extends Component<Settings> {
   constructor(props){
     super(props);
       progress:0,
@@ -19,8 +21,7 @@ export default class Loading extends Component {
       pg:0,
     }
     this.navigation = this.props.navigation;
-    this.socket = this.navigation.getParam('socket');
-    this.socket.onmessage = async (event) => {
+    socket.onmessage = async (event) => {
       var server = JSON.parse(event.data);
       var pg = 100/6;
       var progress = this.state.pg;
@@ -54,9 +55,16 @@ export default class Loading extends Component {
           flag = true;
           this.getOpenProject_other();
           break;
-          case 'openproject':
+          case 'openprojects':
           flag = true;
-          msg = 'Done';
+          msg = 'getting new posts';
+          this.getTrendingProjectAndNewPosts();
+          case 'new_posts':
+          flag = true;
+          msg = 'almost done';
+          case 'trending_projects':
+          flag = true;
+          msg = 'done';
           this.finishLoading();
           break;
         }
@@ -77,6 +85,7 @@ export default class Loading extends Component {
     this.getOpenProject_other = this.getOpenProject_other.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
     this.storageFailure = this.storageFailure.bind(this);
+    this.getTrendingProjectAndNewPosts = this.getTrendingProjectAndNewPosts.bind(this);
   }
   componentDidMount(){
     const userAction={
@@ -86,7 +95,14 @@ export default class Loading extends Component {
     this.send(userAction);
   }
   send(action){
-    this.socket.send(JSON.stringify(action));
+    socket.send(JSON.stringify(action));
+  }
+  getTrendingProjectAndNewPosts(){
+    const userAction={
+      action:'update',
+      type:'explore'
+    };
+    this.send(userAction);
   }
   getNotifications(){
     const userAction={
