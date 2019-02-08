@@ -7,43 +7,64 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View,Alert,AsyncStorage} from 'react-native';
+import WebsocketController from './WebsocketController';
+let controller = new WebsocketController();
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
 
-type Props = {};
-export default class App extends Component<Props> {
+
+export default class App extends Component {
+  constructor(props){
+    super(props);
+    this.navigation = this.props.navigation;
+    this.socket = controller.ws;
+    this.socket.onmessage = (event) =>{
+      var user = JSON.parse(event.data);
+      if (user.action === "login_succes") {
+        this.navigation.navigate('Loading',{socket:this.socket});
+      }else if (user.action === "unverified_user") {
+        this.navigation.navigate('Recovery',{socket:this.socket,action:'activate_account'});
+      }
+    }
+    this.getLogInInfo = this.getLogInInfo.bind(this);
+    this.login = this.login.bind(this);
+  }
+
+  static navigationOptions = {
+    title: 'App' ,
+    header:null,
+  };
+
+  componentDidMount(){
+    this.getLogInInfo();
+  }
+  async getLogInInfo(){
+    try {
+      const username = await AsyncStorage.getItem('username');
+      const password = await AsyncStorage.getItem('password');
+      if (username !== null || password !== null) {
+        // We have data!!
+        this.login(username,password);
+      }else{
+        this.navigation.navigate("Login",{socket:this.socket});
+      }
+     } catch (error) {
+       console.log(error.message);
+     }
+  }
+
+  login(username,password){
+    var UserAction = {
+      action: "login",
+      name: username,
+      pass: password
+    };
+    this.socket.send(JSON.stringify(UserAction));
+  }
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+      <View>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});

@@ -52,22 +52,17 @@ buck-out/
 */fastlane/Preview.html
 */fastlane/screenshots
 
-# Bundle artifact
-*.jsbundle
-
-#Some Items that we dont need
-.babelrc
+#MY ADDITIONS
 .buckconfig
 .flowconfig
 .gitattributes
 .watchmanconfig
-yarn.lock
-app.json
-
-#Android folder (for now)
 android/
-
-#Ios folder (for now)
+babel.config.js
 ios/
-
-
+__tests__/*
+app.json
+*package-lock.json
+*package.json
+# Bundle artifact
+*.jsbundle
