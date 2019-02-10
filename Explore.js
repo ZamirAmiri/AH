@@ -7,22 +7,41 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage} from 'react-native';
+import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import WebsocketController from './WebsocketController';
+let controller = new WebsocketController();
+var socket = controller.ws;
+
 
 export default class Explore extends Component {
   constructor(props){
     super(props);
     this.state={
-      data:[{key:'h'}]
+      data:[{key:'h'}],
+      people_you_might_know:null
     }
     this.getNewPosts = this.getNewPosts.bind(this);
     this.getTrendingProjects = this.getTrendingProjects.bind(this);
+    this.getPeopleYouMightKnow = this.getPeopleYouMightKnow.bind(this);
   }
   componentDidMount(){
     this.getNewPosts();
     this.getTrendingProjects();
+    this.getPeopleYouMightKnow();
   }
+
+  async getPeopleYouMightKnow(){
+    const json = await AsyncStorage.getItem('people_you_might_know');
+    const dt = JSON.parse(json);
+    var data = new Array();
+    for(var i = 0;i<dt.messages.length;i++){
+        dt.messages[i].key = 't';
+        data.push(dt.messages[i]);
+    }
+    this.setState({people_you_might_know:data});
+  }
+
   async getTrendingProjects(){
     const json = await AsyncStorage.getItem('trending_projects');
     const dt = JSON.parse(json);
@@ -44,6 +63,7 @@ export default class Explore extends Component {
     this.setState({data:data});
   }
 
+
   render() {
     return (
       <View style={{flex:1}}>
@@ -52,7 +72,7 @@ export default class Explore extends Component {
           style={{flex:1,backgroundColor:'rbg(150,150,150)'}}
           contentContainerStyle={{width:'100%',padding:0}}
           renderItem={({item}) => {if(item.key == 'h'){
-              return(<Header/>);
+              return(<Header people_you_might_know={this.state.people_you_might_know}/>);
             }else if(item.key == 'sh'){
               return(<Seccond_Header small={item.small} large={item.large}/>);
             }else if (item.key == 'p'){
@@ -89,7 +109,7 @@ class Header extends Component{
           <View style={{width:'100%',height:'25%'}}>
             <FlatList
               style={{width:'100%',height:'100%',paddingLeft:'5%',paddingRight:'5%'}}
-              data={[{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'},{key:'1'}]}
+              data={this.props.people_you_might_know}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               renderItem={({item}) =>{
@@ -166,6 +186,7 @@ class Tile extends Component{
       if(helpcoins){
         const userAction = {
           action:'donate',
+          trending:true,
           username:this.state.username,
           coins:1
         };

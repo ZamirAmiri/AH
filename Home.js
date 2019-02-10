@@ -128,6 +128,7 @@ class Tile extends Component{
         const userAction = {
           action:'donate',
           username:this.state.username,
+          trending:'false',
           coins:1
         };
         helpcoins -= 1;

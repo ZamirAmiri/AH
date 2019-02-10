@@ -23,49 +23,50 @@ export default class Loading extends Component<Settings> {
     this.navigation = this.props.navigation;
     socket.onmessage = async (event) => {
       var server = JSON.parse(event.data);
-      var pg = 100/6;
+      var pg = 100/9;
       var progress = this.state.pg;
-      var flag = false;
+      var flag = true;
       var string = '';
       var msg = null;
       if (server.action === "update") {
         switch (server.type) {
           case 'personal':
-          flag = true;
           msg = 'getting notifications';
           this.getNotifications();
           break;
           case 'notifications':
-          flag = true;
           msg = 'getting your projects';
           this.getProjectsOfUser();
           break;
           case 'projects_user':
-          flag = true;
           msg = 'getting your followers';
           this.getHelpers();
           break;
           case 'helpers':
-          msg = 'getting your idols';
-          flag = true;
           this.getHelpees();
+          msg = 'getting your idols';
           break;
           case 'helpees':
           msg = 'getting other open projects';
-          flag = true;
           this.getOpenProject_other();
           break;
           case 'openprojects':
-          flag = true;
           msg = 'getting new posts';
           this.getTrendingProjectAndNewPosts();
+          break;
           case 'new_posts':
-          flag = true;
           msg = 'almost done';
+          break;
           case 'trending_projects':
-          flag = true;
-          msg = 'done';
+          msg = 'getting people you might know';
+          this.getPeopleYouMightKnow();
+          break;
+          case 'people_you_might_know':
+          msg ='done';
           this.finishLoading();
+          break;
+          default:
+          flag = false;
           break;
         }
         if(flag){
@@ -86,9 +87,10 @@ export default class Loading extends Component<Settings> {
     this.finishLoading = this.finishLoading.bind(this);
     this.storageFailure = this.storageFailure.bind(this);
     this.getTrendingProjectAndNewPosts = this.getTrendingProjectAndNewPosts.bind(this);
+    this.getPeopleYouMightKnow = this.getPeopleYouMightKnow.bind(this);
   }
   componentDidMount(){
-    const userAction={
+    const userAction = {
       action:'update',
       type:'personal'
     };
@@ -97,6 +99,15 @@ export default class Loading extends Component<Settings> {
   send(action){
     socket.send(JSON.stringify(action));
   }
+
+  getPeopleYouMightKnow(){
+    const userAction = {
+      action:'update',
+      type:'people_you_might_know',
+    }
+    this.send(userAction);
+  }
+
   getTrendingProjectAndNewPosts(){
     const userAction={
       action:'update',
