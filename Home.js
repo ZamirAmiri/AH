@@ -124,7 +124,7 @@ class Tile extends Component{
   async donate(username,coins){
       var helpcoins = await AsyncStorage.getItem('helpcoins');
       helpcoins = parseInt(helpcoins);
-      if(helpcoins){
+      if(helpcoins &&  this.state.currentHC < this.state.goal){
         const userAction = {
           action:'donate',
           username:this.state.username,
@@ -137,7 +137,9 @@ class Tile extends Component{
         helpcoins = helpcoins.toString();
         await AsyncStorage.setItem('helpcoins',helpcoins);
         this.setState({currentHC:this.state.currentHC + 1});
-      }else{
+      }else if(helpcoins){
+        Alert.alert('This project does not require more funding');
+      }else {
         Alert.alert('You have no more coins to spend');
       }
   }

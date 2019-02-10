@@ -18,7 +18,7 @@ export default class Explore extends Component {
   constructor(props){
     super(props);
     this.state={
-      data:[{key:'h'}],
+      data:[{key:'h'},{key:'sh',small:'Articles',large:'News'}],
       people_you_might_know:null
     }
     this.getNewPosts = this.getNewPosts.bind(this);
@@ -60,6 +60,7 @@ export default class Explore extends Component {
         dt.messages[i].key = 'p';
         data.push(dt.messages[i]);
     }
+    data.push({key:'sh',small:'People helping',large:'Trending'});
     this.setState({data:data});
   }
 
