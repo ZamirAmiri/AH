@@ -6,27 +6,38 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,ScrollView,ImageBackground,TouchableOpacity,Image,TextInput,FlatList} from 'react-native';
+import {Platform, StyleSheet, Text, View,ScrollView,ImageBackground,TouchableOpacity,Image,TextInput,FlatList,AsyncStorage} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Cache from './Cache';
-let cache = new Cache();
-
-
 
 export default class Explore extends Component {
   constructor(props){
     super(props);
     this.state={
+      followers:0,
+      following:0,
+      generated:0,
+      project_completed:0,
       data:[{key:'h'},{key:'stat'},{key:'n'},{key:'n'},{key:'n'},{key:'sh', small:'Yesterday'},{key:'n'},{key:'n'},{key:'n'},{key:'n'}]
     }
   }
-
+  componentDidMount(){
+    this.getProfileData();
+  }
+  async getProfileData(){
+    var followers = await AsyncStorage.getItem('followers');
+    followers = parseInt(followers);
+    var following = await AsyncStorage.getItem('following');
+    following = parseInt(following);
+    var generated = await AsyncStorage.getItem('accumulated');
+    generated = parseInt(generated);
+    this.setState({followers:followers,following:following,generated:generated});
+  }
   render() {
     return (
       <View style={{flex:1}}>
         <ScrollView style={{width:'100%'}} contentContainerStyle={{alignItems:'center'}}>
-          <Header username = {cache.myUsername} followers={cache.myNumFollowers} following={cache.myNumFollowing} />
-          <Statistics helpCoinsGenerated={cache.myAccumulated}/>
+          <Header username = {'zamir'} followers={this.state.followers} following={this.state.following}/>
+          <Statistics generated={this.state.generated}/>
           <Impact/>
           <View style={{height:15}}/>
           <View style={{width:'90%',paddingTop:10}}>
@@ -50,7 +61,7 @@ class Header extends Component{
         <View style={{width:'100%',height:300,paddingLeft:'5%',paddingRight:'5%'}}>
           <View style={{height:'5%',width:'100%'}}></View>
           <View style={{width:'100%',height:'20%',justifyContent:'center'}}>
-            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>{this.props.username}</Text>
+            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>{global.username}</Text>
             <View style={{width:'60%',height:3}}><ProgressBar height='100%' width='100%'/></View>
           </View>
           <View style={{width:'100%',height:'50%',justifyContent:'center',alignItems:'flex-end',alignItems:'center',padding:'5%'}}>
@@ -98,7 +109,7 @@ class Statistics extends Component{
             >
               <View style={{width:'50%',height:'80%',justifyContent:'space-between'}}>
                 <Text style={{fontSize:13,color:'white'}}>Helpcoins Generated</Text>
-                <Text style={{fontSize:25,color:'white'}}>{cache.myAccumulated}</Text>
+                <Text style={{fontSize:25,color:'white'}}>{this.props.generated}</Text>
               </View>
               <View style={{width:'50%',height:'80%',justifyContent:'center',alignItems:'center'}}>
                 <View style={{width:'60%',height:'55%',backgroundColor:'white',borderRadius:500}}/>

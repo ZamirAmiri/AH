@@ -17,30 +17,27 @@ var socket = controller.ws;
 
 
 export default class Home extends Component {
+
   constructor(props){
     super(props);
     this.state={
       data:[],
       helpcoins:0,
+      change:global.refresh,
     }
-
     this.getProjectData = this.getProjectData.bind(this);
-    this.getPersonalData = this.getPersonalData.bind(this);
     this.navigation = this.props.navigation;
+
   }
   componentDidMount(){
     this.getProjectData();
-    this.getPersonalData();
+  }
 
-  }
-  async getPersonalData(){
-    var value = await AsyncStorage.getItem('helpcoins');
-    value = parseInt(value);
-    this.setState({helpcoins:value});
-  }
+
   async getProjectData(){
     var json = await AsyncStorage.getItem('openprojects');
     const username = await AsyncStorage.getItem('username');
+    global.username = username;
     const dt = JSON.parse(json);
     var data= new Array();
     data[0] = 0;
@@ -52,6 +49,7 @@ export default class Home extends Component {
         dt.messages[i].key = 'project';
         data.push(dt.messages[i]);
       }
+      dt.messages[i].helpcoins = parseInt(dt.messages[i].helpcoins);
     }
     this.setState({data:data});
   }
@@ -65,12 +63,10 @@ export default class Home extends Component {
           style={{flex:1,backgroundColor:'rbg(150,150,150)'}}
           contentContainerStyle={{width:'100%'}}
           renderItem={({item}) => {if(item.key == 'header'){
-              return(<Header username = {item.username} helpcoins= {item.helpcoins} goal={item.goal} creationdate = {item.creationdate} projectname={item.projectname} foundationname={item.foundationname} currentHC={this.state.helpcoins}/>);
-              }else{
-                return(<Tile username = {item.username} helpcoins= {item.helpcoins} goal={item.goal} creationdate = {item.creationdate} projectname={item.projectname} foundationname={item.foundationname} thos={this}/>);
-                }
-              }
-            }
+            return(<Header username = {item.username} helpcoins= {item.helpcoins}  goal={item.goal} creationdate = {item.creationdate} projectname={item.projectname} foundationname={item.foundationname}/>);
+          }else{
+            return(<Tile username = {item.username} helpcoins= {item.helpcoins} goal={item.goal} creationdate = {item.creationdate} projectname={item.projectname} foundationname={item.foundationname} thos={this}/>);
+          }}}
         />
       </View>
     );
@@ -88,7 +84,7 @@ class Header extends Component{
               <Text style={{width:'55%',textAlign:'center',color:'white',fontSize:20}}>addinghelp</Text>
               <View style={{width:'20%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                 <Text style={{width:'50%',textAlign:'right',fontSize:18,color:'white'}}>
-                  {this.props.currentHC}
+                  {global.helpcoins}
                 </Text>
                 <Image source={{uri:'https://img.icons8.com/cotton/2x/like.png'}} style={{width:'50%',height:'100%'}}/>
               </View>
@@ -113,7 +109,7 @@ class Tile extends Component{
       relativeCreationTime:null,
       unit:null,
       username:this.props.username,
-      currentHC: this.props.helpcoins,
+      helpcoins: this.props.helpcoins,
       goal: this.props.goal,
     }
     this.calculateUploadTime= this.calculateUploadTime.bind(this);
@@ -123,27 +119,24 @@ class Tile extends Component{
   }
   componentDidMount(){
     this.calculateUploadTime();
-    var int = parseInt(this.state.currentHC);
-    this.setState({currentHC:int});
   }
 
-  async donate(username,coins){
-      var helpcoins = await AsyncStorage.getItem('helpcoins');
-      helpcoins = parseInt(helpcoins);
-      if(helpcoins &&  this.state.currentHC < this.state.goal){
+  async donate(){
+      if(global.helpcoins - 1 >= 0 &&  this.state.helpcoins < this.state.goal){
         const userAction = {
           action:'donate',
           username:this.state.username,
           trending:false,
           coins:1
         };
-        helpcoins -= 1;
+        var wallet = global.helpcoins;
+        wallet = wallet - 1;
+        global.helpcoins = wallet;
         socket.send(JSON.stringify(userAction));
-        this.super.setState({helpcoins:helpcoins});
-        helpcoins = helpcoins.toString();
-        await AsyncStorage.setItem('helpcoins',helpcoins);
-        this.setState({currentHC:this.state.currentHC + 1});
-      }else if(this.state.currentHC >= this.state.goal){
+        //this.super.setState({helpcoins:this.state.helpcoins + 1});
+        this.setState({helpcoins:this.state.helpcoins + 1});
+        this.super.forceUpdate();
+      }else if(this.state.helpcoins >= this.state.goal){
         Alert.alert('This project does not require more funding');
       }else {
         Alert.alert('You have no more coins to spend');
@@ -156,7 +149,7 @@ class Tile extends Component{
     const dmy = arr[0].split('-');
     const hms = arr[1].split(':');
     const today = new Date();
-    var creationTime  = new Date(dmy[0],dmy[1]-1,dmy[2],hms[0],hms[1],hms[2]).getTime()/1000;
+    var creationTime    = new Date(dmy[0],dmy[1]-1,dmy[2],hms[0],hms[1],hms[2]).getTime()/1000;
     const currentTime   = today.getTime()/1000;
     var relativeCreationTime = currentTime - creationTime;
     //Alert.alert(today.getTime().toString() + '\n' + new Date(2019,1,31,16,0,58).getTime() + '\n' + currentTime.toString() + '\n' + creationTime.toString())
@@ -193,7 +186,11 @@ class Tile extends Component{
             imageStyle={{width:'100%',height:'100%'}}
             style={{width:'100%',height:'75%',justifyContent:'space-between'}}>
             <View style={{width:'100%',height:'10%',alignItems:'flex-end',padding:'5%'}}><Image style={{width:'15%',height:'100%',backgroundColor:'white'}}/></View>
-            <View style={{padding:'5%',width:'100%'}}><Text style={{fontSize:20,color:'white',fontWeight:'800'}}>{this.props.projectname}</Text></View>
+            <View style={{padding:'5%',width:'100%'}}>
+              <Text style={{fontSize:20,color:'white',fontWeight:'800'}}>
+                {this.props.projectname}
+              </Text>
+            </View>
           </ImageBackground>
           <View style={{width:'100%',height:'21%',backgroundColor:'white',flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
             <View style={{width:'55%',height:'100%',padding:1,flexDirection:'row',justifyContent:'space-between'}}>
@@ -210,11 +207,11 @@ class Tile extends Component{
                 style={{width:'35%',height:'100%',borderRadius:500,resizeMode:'center'}}
               />
               <View style={{width:'60%',height:'100%',justifyContent:'center'}}>
-                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.currentHC}/{this.props.goal}</Text>
+                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.helpcoins}/{this.props.goal}</Text>
               </View>
             </TouchableOpacity>
           </View>
-          <ProgressBar height='4%' goal={this.props.goal} current={this.state.currentHC}/>
+          <ProgressBar height='4%' goal={this.props.goal} current={this.state.helpcoins}/>
         </View>
       );
   }

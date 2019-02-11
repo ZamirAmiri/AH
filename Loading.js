@@ -84,7 +84,6 @@ export default class Loading extends Component {
     this.getHelpees = this.getHelpees.bind(this);
     this.getOpenProject_other = this.getOpenProject_other.bind(this);
     this.finishLoading = this.finishLoading.bind(this);
-    this.storageFailure = this.storageFailure.bind(this);
     this.getTrendingProjectAndNewPosts = this.getTrendingProjectAndNewPosts.bind(this);
     this.getPeopleYouMightKnow = this.getPeopleYouMightKnow.bind(this);
   }
@@ -152,16 +151,14 @@ export default class Loading extends Component {
   async finishLoading(){
     var json = await AsyncStorage.getItem('personal');
     var data = JSON.parse(json);
+    global.helpcoins    = data.helpcoins;
+    global.username     = data.username;
     data.helpcoins = data.helpcoins.toString();
     data.accumulated = data.accumulated.toString();
     data.followers = data.followers.toString();
     data.following = data.following.toString();
     await AsyncStorage.multiSet([['username',data.username],['birthdate',data.birthdate],['email',data.email],['gender',data.gender],['helpcoins',data.helpcoins],['accumulated',data.accumulated],['followers',data.followers],['following',data.following]]);
     this.navigation.navigate('TabNavigator');
-  }
-
-  storageFailure(){
-    Alert.alert('Something went wrong! \n Please restart the app.');
   }
 
   static navigationOptions = {

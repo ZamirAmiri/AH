@@ -10,8 +10,7 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import WebsocketController from './WebsocketController';
-import Cache from './Cache';
-let cache = new Cache();
+import Home from './Home';
 let controller = new WebsocketController();
 var socket = controller.ws;
 
@@ -26,6 +25,7 @@ export default class Explore extends Component {
     this.getNewPosts = this.getNewPosts.bind(this);
     this.getTrendingProjects = this.getTrendingProjects.bind(this);
     this.getPeopleYouMightKnow = this.getPeopleYouMightKnow.bind(this);
+
   }
   componentDidMount(){
     this.getNewPosts();
@@ -51,6 +51,7 @@ export default class Explore extends Component {
     for(var i = 0;i<dt.messages.length;i++){
         dt.messages[i].key = 't';
         data.push(dt.messages[i]);
+        dt.messages[i].helpcoins = parseInt(dt.messages[i].helpcoins);
     }
     this.setState({data:data});
   }
@@ -170,7 +171,7 @@ class Tile extends Component{
       relativeCreationTime:null,
       unit:null,
       username:this.props.username,
-      currentHC: this.props.helpcoins,
+      helpcoins: this.props.helpcoins,
       goal:this.props.goal,
     }
     this.calculateUploadTime= this.calculateUploadTime.bind(this);
@@ -180,25 +181,25 @@ class Tile extends Component{
   }
   componentDidMount(){
     this.calculateUploadTime();
-    var int = parseInt(this.state.currentHC);
-    this.setState({currentHC:int});
   }
 
   async donate(username,coins){
-      if(cache.myHelpcoins){
-        const userAction = {
-          action:'donate',
-          trending:true,
-          username:this.state.username,
-          coins:1
-        };
-        cache.myHelpcoins -= 1;
-        socket.send(JSON.stringify(userAction));
-      }else if(this.state.currentHC >= this.state.goal){
-        Alert.alert('This project does not require more funding');
-      }else{
-        Alert.alert('You have no more coins to spend');
-      }
+    if(global.helpcoins - 1 >= 0 &&  this.state.helpcoins < this.state.goal){
+      const userAction = {
+        action:'donate',
+        username:this.state.username,
+        trending:true,
+        coins:1
+      };
+      global.helpcoins -= 1;
+      socket.send(JSON.stringify(userAction));
+      //this.super.setState({helpcoins:this.state.helpcoins + 1});
+      this.setState({helpcoins:this.state.helpcoins + 1});
+    }else if(this.state.helpcoins >= this.state.goal){
+      Alert.alert('This project does not require more funding');
+    }else {
+      Alert.alert('You have no more coins to spend');
+    }
   }
 
   calculateUploadTime(){
@@ -261,11 +262,11 @@ class Tile extends Component{
                 style={{width:'35%',height:'100%',borderRadius:500,resizeMode:'center'}}
               />
               <View style={{width:'60%',height:'100%',justifyContent:'center'}}>
-                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.currentHC}/{this.state.goal}</Text>
+                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.helpcoins}/{this.state.goal}</Text>
               </View>
             </TouchableOpacity>
           </View>
-          <ProgressBar height='4%' goal={this.props.goal} current={this.state.currentHC}/>
+          <ProgressBar height='4%' goal={this.props.goal} current={this.state.helpcoins}/>
         </View>
       );
   }
