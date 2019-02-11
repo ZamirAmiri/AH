@@ -10,6 +10,8 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import WebsocketController from './WebsocketController';
+import Cache from './Cache';
+let cache = new Cache();
 let controller = new WebsocketController();
 var socket = controller.ws;
 
@@ -169,6 +171,7 @@ class Tile extends Component{
       unit:null,
       username:this.props.username,
       currentHC: this.props.helpcoins,
+      goal:this.props.goal,
     }
     this.calculateUploadTime= this.calculateUploadTime.bind(this);
     this.donate = this.donate.bind(this);
@@ -182,21 +185,17 @@ class Tile extends Component{
   }
 
   async donate(username,coins){
-      var helpcoins = await AsyncStorage.getItem('helpcoins');
-      helpcoins = parseInt(helpcoins);
-      if(helpcoins){
+      if(cache.myHelpcoins){
         const userAction = {
           action:'donate',
           trending:true,
           username:this.state.username,
           coins:1
         };
-        helpcoins -= 1;
+        cache.myHelpcoins -= 1;
         socket.send(JSON.stringify(userAction));
-        this.super.setState({helpcoins:helpcoins});
-        helpcoins = helpcoins.toString();
-        await AsyncStorage.setItem('helpcoins',helpcoins);
-        this.setState({currentHC:this.state.currentHC + 1});
+      }else if(this.state.currentHC >= this.state.goal){
+        Alert.alert('This project does not require more funding');
       }else{
         Alert.alert('You have no more coins to spend');
       }
@@ -262,7 +261,7 @@ class Tile extends Component{
                 style={{width:'35%',height:'100%',borderRadius:500,resizeMode:'center'}}
               />
               <View style={{width:'60%',height:'100%',justifyContent:'center'}}>
-                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.currentHC}/{this.props.goal}</Text>
+                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.currentHC}/{this.state.goal}</Text>
               </View>
             </TouchableOpacity>
           </View>

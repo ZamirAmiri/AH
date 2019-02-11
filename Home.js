@@ -39,12 +39,12 @@ export default class Home extends Component {
     this.setState({helpcoins:value});
   }
   async getProjectData(){
-    var json = await AsyncStorage.getItem('openproject');
+    var json = await AsyncStorage.getItem('openprojects');
     const username = await AsyncStorage.getItem('username');
     const dt = JSON.parse(json);
     var data= new Array();
     data[0] = 0;
-    for(var i=0;i<dt.messages.length;i++){
+    for(var i=0; i<dt.messages.length;i++){
       if(dt.messages[i].username == username){
         dt.messages[i].key = 'header';
         data[0] = dt.messages[i];
@@ -86,7 +86,12 @@ class Header extends Component{
             <View style={{width:'100%',height:'20%',backgroundColor:'rgba(0,0,0,0.4)',flexDirection:'row',justifyContent:'space-around',alignItems:'center',padding:'2.5%'}}>
               <TouchableOpacity style={{width:'20%',height:'100%'}}><Image source={{uri:'https://img.icons8.com/cotton/2x/like.png'}} style={{width:'100%',height:'100%'}}/></TouchableOpacity>
               <Text style={{width:'55%',textAlign:'center',color:'white',fontSize:20}}>addinghelp</Text>
-              <View style={{width:'20%',height:'100%',alignItems:'center',flexDirection:'row'}}><Text style={{width:'50%',textAlign:'right',fontSize:18,color:'white'}}>{this.props.currentHC}</Text><Image source={{uri:'https://img.icons8.com/cotton/2x/like.png'}} style={{width:'50%',height:'100%'}}></Image></View>
+              <View style={{width:'20%',height:'100%',alignItems:'center',flexDirection:'row'}}>
+                <Text style={{width:'50%',textAlign:'right',fontSize:18,color:'white'}}>
+                  {this.props.currentHC}
+                </Text>
+                <Image source={{uri:'https://img.icons8.com/cotton/2x/like.png'}} style={{width:'50%',height:'100%'}}/>
+              </View>
             </View>
             <View style={{width:'100%',padding:'5%'}}>
               <Text style={{fontSize:22,color:'white'}}>{this.props.projectname}</Text>
@@ -109,6 +114,7 @@ class Tile extends Component{
       unit:null,
       username:this.props.username,
       currentHC: this.props.helpcoins,
+      goal: this.props.goal,
     }
     this.calculateUploadTime= this.calculateUploadTime.bind(this);
     this.donate = this.donate.bind(this);
@@ -128,7 +134,7 @@ class Tile extends Component{
         const userAction = {
           action:'donate',
           username:this.state.username,
-          trending:'false',
+          trending:false,
           coins:1
         };
         helpcoins -= 1;
@@ -137,7 +143,7 @@ class Tile extends Component{
         helpcoins = helpcoins.toString();
         await AsyncStorage.setItem('helpcoins',helpcoins);
         this.setState({currentHC:this.state.currentHC + 1});
-      }else if(helpcoins){
+      }else if(this.state.currentHC >= this.state.goal){
         Alert.alert('This project does not require more funding');
       }else {
         Alert.alert('You have no more coins to spend');

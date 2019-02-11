@@ -12,8 +12,7 @@ import WebsocketController from './WebsocketController';
 let controller = new WebsocketController();
 var socket = controller.ws;
 
-type Settings = {}
-export default class Loading extends Component<Settings> {
+export default class Loading extends Component {
   constructor(props){
     super(props);
       progress:0,

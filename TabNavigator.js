@@ -7,6 +7,7 @@ import Tasks from './Tasks';
 import Activity from './Activity';
 import Profile from './Profile';
 
+
 const TabNavigator = createBottomTabNavigator({
   Home: Home,
   Explore: Explore,

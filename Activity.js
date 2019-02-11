@@ -8,6 +8,10 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import WebsocketController from './WebsocketController';
+let controller = new WebsocketController();
+var socket = controller.ws;
+var followers = AsyncStorage.getItem('helpers');
 
 
 
@@ -164,7 +168,7 @@ class Notification extends Component{
         <View style={{width:'20%',height:'83%',justifyContent:'center',alignItems:'center'}}>
           <Image style={{width:'100%',height:'100%',borderRadius:500}} source={{uri:'https://media.licdn.com/dms/image/C4E03AQG1IdzY7-PsUA/profile-displayphoto-shrink_200_200/0?e=1551916800&v=beta&t=rULLnNcLWVsAZfu1PdKOtTetlf1fQGvhN-sVmP4FhXU'}}/>
         </View>
-        <View style={{width:'75%',height:'100%',justifyContent:'center',paddingLeft:'2.5%'}}>
+        <View style={{flex:5,height:'100%',justifyContent:'center',paddingLeft:'2.5%'}}>
           <Text><Text style={{fontWeight:'900'}}>{this.state.username}</Text>{this.state.info}<Text style={{color:'rgb(240,240,240)',fontWeight:'700'}}> {this.props.date}</Text></Text>
         </View>
       </View>
@@ -178,7 +182,9 @@ class NotificationWithButton extends Component{
     this.state={
       username:'',
       info:this.props.info,
+      follow:true
     }
+    this.follow = this.follow.bind(this);
   }
   componentDidMount(){
     var info = this.state.info;
@@ -186,26 +192,40 @@ class NotificationWithButton extends Component{
     const fat = arr[0].split('<');
     this.setState({username:fat[1],info:arr[1]});
   }
+  follow(){
+    const userAction = {
+      action:'follow',
+      username:this.state.username
+    };
+    socket.send(JSON.stringify(userAction));
+    this.setState({follow:false});
+  }
   render(){
+    var button = null;
+    if(this.state.follow){ button = (
+      <View style={{flex:3,justifyContent:'center',height:'100%'}}>
+        <TouchableOpacity style={{width:'100%',height:'50%',hidden:this.state.follow}} onPress={this.follow}>
+          <LinearGradient
+            start={{x: 0.0, y: 0.0}} end={{x: 1.0, y: 1.0}}
+            colors={['rgb(255,180,0)', 'rgb(255,0,0)']}
+            style={{width:'100%',height:'100%',borderRadius:5,justifyContent:'center'}}
+            >
+            <Text style={{textAlign:'center',color:'white'}}> Follow </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>);
+    }else{
+      button = null;
+    }
     return(
       <View style={{width:'90%',height:75,marginLeft:'5%',marginRight:'5%',marginTop:'1%',overflow:'hidden',borderColor:'rgb(250,250,250)',flexDirection:'row',borderBottomWidth:2,justifyContent:'center'}}>
         <View style={{width:'20%',height:'83%',justifyContent:'center',alignItems:'center'}}>
           <Image style={{width:'100%',height:'100%',borderRadius:500}} source={{uri:'https://media.licdn.com/dms/image/C4E03AQG1IdzY7-PsUA/profile-displayphoto-shrink_200_200/0?e=1551916800&v=beta&t=rULLnNcLWVsAZfu1PdKOtTetlf1fQGvhN-sVmP4FhXU'}}/>
         </View>
-        <View style={{width:'50%',height:'100%',justifyContent:'center',paddingLeft:'2.5%'}}>
+        <View style={{flex:5,height:'100%',justifyContent:'center',paddingLeft:'2.5%'}}>
           <Text><Text style={{fontWeight:'900'}}>{this.state.username}</Text> {this.state.info}<Text style={{color:'rgb(240,240,240)',fontWeight:'700'}}> {this.props.date}</Text></Text>
         </View>
-        <View style={{width:'30%',justifyContent:'center',height:'100%'}}>
-        <TouchableOpacity style={{width:'100%',height:'50%'}}>
-        <LinearGradient
-          start={{x: 0.0, y: 0.0}} end={{x: 1.0, y: 1.0}}
-          colors={['rgb(255,180,0)', 'rgb(255,0,0)']}
-          style={{width:'100%',height:'100%',borderRadius:5,justifyContent:'center'}}
-          >
-          <Text style={{textAlign:'center',color:'white'}}> follow </Text>
-        </LinearGradient>
-        </TouchableOpacity>
-        </View>
+        {button}
       </View>
       );
   }

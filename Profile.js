@@ -3,12 +3,13 @@
  * https://github.com/facebook/react-native
  *
  * @format
- * @flow
  */
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,ScrollView,ImageBackground,TouchableOpacity,Image,TextInput,FlatList} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Cache from './Cache';
+let cache = new Cache();
 
 
 
@@ -24,8 +25,8 @@ export default class Explore extends Component {
     return (
       <View style={{flex:1}}>
         <ScrollView style={{width:'100%'}} contentContainerStyle={{alignItems:'center'}}>
-          <Header/>
-          <Statistics/>
+          <Header username = {cache.myUsername} followers={cache.myNumFollowers} following={cache.myNumFollowing} />
+          <Statistics helpCoinsGenerated={cache.myAccumulated}/>
           <Impact/>
           <View style={{height:15}}/>
           <View style={{width:'90%',paddingTop:10}}>
@@ -49,7 +50,7 @@ class Header extends Component{
         <View style={{width:'100%',height:300,paddingLeft:'5%',paddingRight:'5%'}}>
           <View style={{height:'5%',width:'100%'}}></View>
           <View style={{width:'100%',height:'20%',justifyContent:'center'}}>
-            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>Shair Amiri</Text>
+            <Text style={{fontSize:30,fontWeight:'400',color:'black'}}>{this.props.username}</Text>
             <View style={{width:'60%',height:3}}><ProgressBar height='100%' width='100%'/></View>
           </View>
           <View style={{width:'100%',height:'50%',justifyContent:'center',alignItems:'flex-end',alignItems:'center',padding:'5%'}}>
@@ -61,11 +62,11 @@ class Header extends Component{
           <View style={{width:'100%',height:'20%',flexDirection:'row',borderBottomWidth:2,borderColor:'rgb(200,200,200)',paddingLeft:'5%',paddingRight:'5%'}}>
             <View style={{width:'28%',height:'100%'}}>
               <Text style={{color:'rgb(200,200,200)',fontSize:12}}>followers</Text>
-              <Text style={{color:'black',fontSize:20}}>10k</Text>
+              <Text style={{color:'black',fontSize:20}}>{this.props.followers}</Text>
             </View>
             <View style={{width:'28%',height:'100%'}}>
               <Text style={{color:'rgb(200,200,200)',fontSize:12}}>following</Text>
-              <Text style={{color:'black',fontSize:20}}>12k</Text>
+              <Text style={{color:'black',fontSize:20}}>{this.props.following}</Text>
             </View>
             <View style={{width:'44%',height:'100%'}}>
             <TouchableOpacity style={{width:'100%',height:'75%'}}>
@@ -97,7 +98,7 @@ class Statistics extends Component{
             >
               <View style={{width:'50%',height:'80%',justifyContent:'space-between'}}>
                 <Text style={{fontSize:13,color:'white'}}>Helpcoins Generated</Text>
-                <Text style={{fontSize:25,color:'white'}}>2.5k</Text>
+                <Text style={{fontSize:25,color:'white'}}>{cache.myAccumulated}</Text>
               </View>
               <View style={{width:'50%',height:'80%',justifyContent:'center',alignItems:'center'}}>
                 <View style={{width:'60%',height:'55%',backgroundColor:'white',borderRadius:500}}/>
