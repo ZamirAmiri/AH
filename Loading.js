@@ -157,7 +157,8 @@ export default class Loading extends Component {
     data.accumulated = data.accumulated.toString();
     data.followers = data.followers.toString();
     data.following = data.following.toString();
-    await AsyncStorage.multiSet([['username',data.username],['birthdate',data.birthdate],['email',data.email],['gender',data.gender],['helpcoins',data.helpcoins],['accumulated',data.accumulated],['followers',data.followers],['following',data.following]]);
+    data.completed_projects = data.completed_projects.toString();
+    await AsyncStorage.multiSet([['username',data.username],['birthdate',data.birthdate],['email',data.email],['gender',data.gender],['helpcoins',data.helpcoins],['accumulated',data.accumulated],['followers',data.followers],['following',data.following],['completed_projects',data.completed_projects]]);
     this.navigation.navigate('TabNavigator');
   }
 

@@ -66,3 +66,4 @@ app.json
 *package.json
 # Bundle artifact
 *.jsbundle
+.vscode/

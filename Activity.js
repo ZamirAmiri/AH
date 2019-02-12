@@ -9,6 +9,7 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,FlatList,ImageBackground,TouchableOpacity,Image,TextInput,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import WebsocketController from './WebsocketController';
+
 let controller = new WebsocketController();
 var socket = controller.ws;
 var followers = AsyncStorage.getItem('helpers');
@@ -37,8 +38,8 @@ export default class Explore extends Component {
     var data = new Array();
     data.push({key:'h',numNotifications:dt.messages.length});
     for(var i = 0;i<dt.messages.length;i++){
-      if(dt.messages[i].info.includes('following')){
-        dt.messages[i].key = 'nb'
+      if(dt.messages[i].info.includes('following') && !dt.messages[i].info.includes('back')){
+        dt.messages[i].key = 'nb';
       }else{
         dt.messages[i].key = 'n';
       }

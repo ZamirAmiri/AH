@@ -40,14 +40,30 @@ export default class Home extends Component {
     global.username = username;
     const dt = JSON.parse(json);
     var data= new Array();
+    var flag = true;
     data[0] = 0;
     for(var i=0; i<dt.messages.length;i++){
       if(dt.messages[i].username == username){
         dt.messages[i].key = 'header';
         data[0] = dt.messages[i];
+        const jsonObject = {
+          helpcoins:parseInt(dt.messages[i].helpcoins),
+          goal:parseInt(dt.messages[i].goal),
+          creationdate:dt.messages[i].creationdate
+        };
+        await AsyncStorage.setItem('current_project',JSON.stringify(jsonObject));
       }else{
         dt.messages[i].key = 'project';
         data.push(dt.messages[i]);
+        if(flag){
+          const jsonObject = {
+            helpcoins:parseInt(dt.messages[i].helpcoins),
+            goal:parseInt(dt.messages[i].goal),
+            creationdate:dt.messages[i].creationdate
+          };
+          flag = false;
+          await AsyncStorage.setItem('comp_proj',JSON.stringify(jsonObject));
+        }
       }
       dt.messages[i].helpcoins = parseInt(dt.messages[i].helpcoins);
     }

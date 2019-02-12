@@ -6,7 +6,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,ScrollView,ImageBackground,TouchableOpacity,Image,TextInput,FlatList,AsyncStorage} from 'react-native';
+import {Platform, StyleSheet, Text, View,ScrollView,ImageBackground,TouchableOpacity,Image,TextInput,FlatList,AsyncStorage,Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 export default class Explore extends Component {
@@ -16,13 +16,17 @@ export default class Explore extends Component {
       followers:0,
       following:0,
       generated:0,
-      project_completed:0,
-      data:[{key:'h'},{key:'stat'},{key:'n'},{key:'n'},{key:'n'},{key:'sh', small:'Yesterday'},{key:'n'},{key:'n'},{key:'n'},{key:'n'}]
+      completed_project:null,
+      cp_helpcoins:0,
+      cp_goal:0,
+      cp_creationdate:null,
     }
+    this.getProfileData = this.getProfileData.bind(this);
   }
   componentDidMount(){
     this.getProfileData();
   }
+
   async getProfileData(){
     var followers = await AsyncStorage.getItem('followers');
     followers = parseInt(followers);
@@ -30,30 +34,32 @@ export default class Explore extends Component {
     following = parseInt(following);
     var generated = await AsyncStorage.getItem('accumulated');
     generated = parseInt(generated);
-    this.setState({followers:followers,following:following,generated:generated});
+    var completed = await AsyncStorage.getItem('completed_projects');
+    completed = parseInt(completed);
+    this.setState({followers:followers,following:following,generated:generated,completed:completed});
   }
+
   render() {
     return (
       <View style={{flex:1}}>
         <ScrollView style={{width:'100%'}} contentContainerStyle={{alignItems:'center'}}>
           <Header username = {'zamir'} followers={this.state.followers} following={this.state.following}/>
-          <Statistics generated={this.state.generated}/>
+          <Statistics generated={this.state.generated} completed={this.state.completed}/>
           <Impact/>
           <View style={{height:15}}/>
           <View style={{width:'90%',paddingTop:10}}>
             <Text style={{fontSize:20,color:'black'}}>Current Project</Text>
           </View>
-          <Project/>
+          <Project type={'current_project'}/>
           <View style={{width:'90%',paddingTop:10}}>
             <Text style={{fontSize:20,color:'black'}}>Completed Project</Text>
           </View>
-          <Project/>
+          <Project type={'comp_proj'}/>
         </ScrollView>
       </View>
     );
   }
 }
-
 
 class Header extends Component{
   render(){
@@ -122,7 +128,7 @@ class Statistics extends Component{
             >
               <View style={{width:'50%',height:'80%',justifyContent:'space-between'}}>
                 <Text style={{fontSize:13,color:'white'}}>projects Completed</Text>
-                <Text style={{fontSize:25,color:'white'}}>34</Text>
+                <Text style={{fontSize:25,color:'white'}}>{this.props.completed}</Text>
               </View>
               <View style={{width:'50%',height:'80%',justifyContent:'center',alignItems:'center'}}>
                 <View style={{width:'60%',height:'55%',backgroundColor:'white',borderRadius:500}}/>
@@ -178,7 +184,95 @@ class Impact extends Component{
   }
 }
 
-class Project extends Component {
+class Project extends Component{
+  constructor(props){
+    super(props);
+    this.state={
+      uploadTime:'unknown',
+      relativeCreationTime:null,
+      unit:null,
+      username: global.username,
+      creationdate : '',
+      helpcoins : '',
+      goal: '',
+      type : props.type,
+    }
+    this.calculateUploadTime = this.calculateUploadTime.bind(this);
+    this.donate = this.donate.bind(this);
+    this.init = this.init.bind(this);
+  }
+
+  componentDidMount(){
+    this.init();
+  }
+
+  async init(){
+    const json = await AsyncStorage.getItem(this.state.type);
+    const current_project = JSON.parse(json);
+    var helpcoins = current_project.helpcoins;
+    var goal = current_project.goal;
+    var creationdate = current_project.creationdate;
+    this.setState({helpcoins:helpcoins,goal:goal,creationdate:creationdate}),this.calculateUploadTime();
+  }
+
+  async donate(){
+    if(global.helpcoins - 1 >= 0 &&  this.state.helpcoins < this.state.goal){
+      const userAction = {
+        action:'donate',
+        username:this.state.username,
+        trending:false,
+        coins:1
+      };
+      var wallet = global.helpcoins;
+      wallet = wallet - 1;
+      global.helpcoins = wallet;
+      socket.send(JSON.stringify(userAction));
+      //this.super.setState({helpcoins:this.state.helpcoins + 1});
+      this.setState({helpcoins:this.state.helpcoins + 1});
+      this.super.forceUpdate();
+    }else if(this.state.helpcoins >= this.state.goal){
+      Alert.alert('This project does not require more funding');
+    }else {
+      Alert.alert('You have no more coins to spend');
+    }
+}
+
+calculateUploadTime(){
+    const date = this.state.creationdate;
+    const arr = date.split(' ');
+    const dmy = arr[0].split('-');
+    const hms = arr[1].split(':');
+    const today = new Date();
+    var creationTime    = new Date(dmy[0],dmy[1]-1,dmy[2],hms[0],hms[1],hms[2]).getTime()/1000;
+    const currentTime   = today.getTime()/1000;
+    var relativeCreationTime = currentTime - creationTime;
+    //Alert.alert(today.getTime().toString() + '\n' + new Date(2019,1,31,16,0,58).getTime() + '\n' + currentTime.toString() + '\n' + creationTime.toString())
+    var flag = '';
+    const dayInSecconds = 24*3600;
+    const yearinSecconds  = 365*dayInSecconds;
+    const monthInSecconds = yearinSecconds/12;
+    if(relativeCreationTime >= yearinSecconds){
+      flag = 'years';
+      relativeCreationTime /= yearinSecconds;
+    }else if(relativeCreationTime >= monthInSecconds){
+      flag = 'months';
+      relativeCreationTime /= monthInSecconds;
+    }else if(relativeCreationTime >= dayInSecconds){
+      flag = 'days';
+      relativeCreationTime /= dayInSecconds;
+    }else if(relativeCreationTime >= 3600){
+      flag = 'hours';
+      relativeCreationTime /= 3600;
+    }else if(relativeCreationTime >= 60){
+      flag = 'minutes';
+      relativeCreationTime /= 60;
+    }else{
+      flag = 'seconds';
+    }
+    var relativeCreationTime = Math.round(relativeCreationTime*10)/10;
+    this.setState({relativeCreationTime:relativeCreationTime,unit:flag});
+}
+
   render(){
     return(
         <View style={{width:'90%',height:280,justifyContent:'center'}}>
@@ -196,8 +290,8 @@ class Project extends Component {
                 style={{width:'25%',height:'100%',borderRadius:500,resizeMode:'center'}}
               />
               <View style={{width:'70%',height:'100%',justifyContent:'center'}}>
-                <Text style={{fontWeight:'700',fontSize:12}}>shairamiri</Text>
-                <Text style={{color:'rgb(170,170,170)',fontSize:8}}>10 hours ago</Text>
+                <Text style={{fontWeight:'700',fontSize:12}}>{this.state.username}</Text>
+                <Text style={{color:'rgb(170,170,170)',fontSize:8}}>{this.state.relativeCreationTime} {this.state.unit} ago</Text>
               </View>
             </View>
             <View style={{width:'35%',height:'100%',flexDirection:'row',justifyContent:'space-around'}}>
@@ -205,7 +299,7 @@ class Project extends Component {
               style={{width:'35%',height:'100%',borderRadius:500,resizeMode:'center'}}
             />
             <View style={{width:'60%',height:'100%',justifyContent:'center'}}>
-              <Text style={{fontWeight:'700',fontSize:12}}>123/250</Text>
+              <Text style={{fontWeight:'700',fontSize:12}}>{this.state.helpcoins}/{this.state.goal}</Text>
             </View>
             </View>
           </View>
@@ -215,7 +309,6 @@ class Project extends Component {
       );
   }
 }
-
 
 class ProgressBar extends Component{
   constructor(props){
